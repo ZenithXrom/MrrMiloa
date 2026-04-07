@@ -3,11 +3,9 @@ package com.example.calorietracker.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.calorietracker.ui.screens.AddFoodScreen
 import com.example.calorietracker.ui.screens.DashboardScreen
 import com.example.calorietracker.ui.screens.DiaryScreen

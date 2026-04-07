@@ -20,7 +20,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private val foodViewModel: FoodViewModel by viewModels {
-        FoodViewModelFactory((application as CalorieTrackerApp).foodRepository)
+        FoodViewModelFactory(
+            (application as CalorieTrackerApp).foodRepository,
+            (application as CalorieTrackerApp).nutritionService
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

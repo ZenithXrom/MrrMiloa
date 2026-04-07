@@ -1,72 +1,83 @@
-# CalorieTracker (Fase 1 MVP)
+# CalorieTracker (Fase 1 + base multi-fuente de nutrición)
 
-App Android tipo MyFitnessPal construida con Kotlin + Jetpack Compose + Room + Firebase Auth.
+App Android tipo MyFitnessPal construida con Kotlin + Jetpack Compose + Room + Firebase.
 
-## Qué incluye en esta entrega
+## Qué incluye
 
 - Login con Google (Firebase Auth)
 - Registro manual de alimentos
 - Cálculo de calorías por día
 - Base de datos local con Room
-- Dashboard principal
-- Historial diario
-- Base inicial offline-first con bandera `isSynced` y repositorio de sync
+- Dashboard principal + historial diario
+- Base offline-first con bandera `isSynced`
+- **Nueva capa de servicios nutricionales multi-fuente:**
+  - Open Food Facts (barcode)
+  - USDA FoodData Central (búsqueda genérica)
+  - Edamam (texto natural)
 
-## Requisitos
+## Configuración técnica
 
-- Android Studio estable (Hedgehog o superior)
-- JDK 17
-- Android SDK 34
-- Cuenta Firebase
+- `compileSdk = 34`
+- `minSdk = 24`
+- `targetSdk = 34`
+- Kotlin + Compose + MVVM + Repository
+- Gradle Kotlin DSL (sin Version Catalog)
 
-## 1) Crear proyecto vacío y pegar archivos
+## 1) Crear proyecto y pegar archivos
 
 1. Crea un proyecto **Empty Compose Activity** en Android Studio.
-2. Usa package: `com.example.calorietracker`.
-3. Cierra Android Studio.
-4. Reemplaza el contenido completo por estos archivos.
-5. Abre nuevamente el proyecto.
+2. Usa package `com.example.calorietracker`.
+3. Reemplaza los archivos por este contenido.
+4. Abre el proyecto y sincroniza Gradle.
 
-## 2) Configurar Firebase + Google Login
+## 2) Firebase (Google Login)
 
-1. En [Firebase Console](https://console.firebase.google.com), crea un proyecto.
+1. Crea proyecto en Firebase.
 2. Agrega app Android con `applicationId = com.example.calorietracker`.
-3. Descarga `google-services.json` y colócalo en:
-   - `app/google-services.json`
-4. En Firebase Console habilita:
-   - Authentication > Sign-in method > Google
-5. En Google Cloud/Firebase, toma el **Web client ID** y reemplaza:
-   - `app/src/main/res/values/strings.xml`
-   - valor de `default_web_client_id`
+3. Descarga `google-services.json` en `app/google-services.json`.
+4. Habilita Google Sign-In en Authentication.
+5. Reemplaza `default_web_client_id` en `app/src/main/res/values/strings.xml`.
 
-## 3) Sincronizar Gradle
+## 3) API Keys nutrición
 
-1. Abre Android Studio.
-2. Presiona **Sync Project with Gradle Files**.
-3. Espera a que finalice sin errores.
+Agrega en `~/.gradle/gradle.properties` o en `gradle.properties` local:
 
-## 4) Ejecutar
+```properties
+USDA_API_KEY=tu_api_key_usda
+EDAMAM_APP_ID=tu_app_id_edamam
+EDAMAM_APP_KEY=tu_app_key_edamam
+```
 
-1. Conecta dispositivo o abre emulador.
-2. Presiona **Run**.
+> Open Food Facts no requiere key para el endpoint usado.
 
-## 5) Compilar APK debug
+## 4) Cómo funciona la normalización de datos
 
-Desde terminal:
+Se usa un modelo unificado `FoodItem` con campos:
+
+- `name`
+- `calories`
+- `protein`
+- `carbs`
+- `fat`
+- `source` y `externalId`
+
+Cada API se transforma a `FoodItem` desde `NutritionService`, para que la UI y persistencia no dependan de DTOs externos.
+
+## 5) Conexión con persistencia local (Room)
+
+1. El usuario busca alimento por modo (manual / barcode / USDA / texto).
+2. `FoodViewModel` consulta `NutritionService`.
+3. El resultado vuelve como `FoodItem` normalizado.
+4. Al pulsar **Usar**, `FoodRepository.addFood(foodItem, date)` convierte `FoodItem` a `FoodEntity`.
+5. `FoodDao.insertFood(...)` persiste localmente.
+6. `isSynced = false` deja listo el registro para sincronización posterior.
+
+## 6) Run / APK
 
 ```bash
 ./gradlew assembleDebug
 ```
 
-APK resultante:
+APK:
 
 `app/build/outputs/apk/debug/app-debug.apk`
-
-## Próximas fases
-
-- Fase 2: macros, gráficas, comidas frecuentes, copiar días
-- Fase 3: sync real en segundo plano con cola de cambios
-- Fase 4: Open Food Facts + USDA
-- Fase 5: progreso físico y reportes
-- Fase 6: premium gratis
-

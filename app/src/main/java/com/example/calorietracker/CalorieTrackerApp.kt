@@ -6,6 +6,7 @@ import com.example.calorietracker.data.local.AppDatabase
 import com.example.calorietracker.data.repository.AuthRepository
 import com.example.calorietracker.data.repository.FoodRepository
 import com.example.calorietracker.data.repository.SyncRepository
+import com.example.calorietracker.data.repository.NutritionService
 
 class CalorieTrackerApp : Application() {
 
@@ -21,6 +22,9 @@ class CalorieTrackerApp : Application() {
     lateinit var syncRepository: SyncRepository
         private set
 
+    lateinit var nutritionService: NutritionService
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
@@ -33,5 +37,6 @@ class CalorieTrackerApp : Application() {
         foodRepository = FoodRepository(database.foodDao(), database.dailyEntryDao())
         authRepository = AuthRepository(this)
         syncRepository = SyncRepository(database.foodDao())
+        nutritionService = NutritionService()
     }
 }

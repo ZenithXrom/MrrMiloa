@@ -20,6 +20,14 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val usdaApiKey = (project.findProperty("USDA_API_KEY") as? String) ?: ""
+        val edamamAppId = (project.findProperty("EDAMAM_APP_ID") as? String) ?: ""
+        val edamamAppKey = (project.findProperty("EDAMAM_APP_KEY") as? String) ?: ""
+
+        buildConfigField("String", "USDA_API_KEY", "\"$usdaApiKey\"")
+        buildConfigField("String", "EDAMAM_APP_ID", "\"$edamamAppId\"")
+        buildConfigField("String", "EDAMAM_APP_KEY", "\"$edamamAppKey\"")
     }
 
     buildTypes {
@@ -40,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
@@ -80,6 +89,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
